@@ -10,6 +10,13 @@
   mix-blend-mode: screen !important;
 }
 
+.freem-gif-video {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
 /* 2026-07-07 Entry loader: black screen -> circular progress -> enter button. */
 html.freem-loading,
 body.freem-entry-locked {

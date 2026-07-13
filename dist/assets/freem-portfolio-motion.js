@@ -118,7 +118,7 @@
       ],
       { duration: 1620, delay: staggerDelay(index, 720), easing: easeSoft, clear: false }
     );
-    if (el.tagName === "IMG") parallaxItems.add(el);
+    // Keep scroll performance stable on media-heavy portfolio pages.
   }
 
   function openingAnimation() {

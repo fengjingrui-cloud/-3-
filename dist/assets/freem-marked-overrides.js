@@ -96,6 +96,8 @@
 
   const processed = new WeakSet();
   let scrollObserver = null;
+  let scrollFloatVisibilityObserver = null;
+  const activeScrollFloatNodes = new Set();
   let rafScheduled = false;
   let scrollFloatFrame = null;
   let scrollFloatListenersReady = false;
@@ -233,7 +235,7 @@
   }
 
   function updateScrollFloatNodes() {
-    document.querySelectorAll(`[${PROCESSED_ATTR}="true"]`).forEach(updateScrollFloatNode);
+    activeScrollFloatNodes.forEach(updateScrollFloatNode);
   }
 
   function scheduleScrollFloatUpdate() {
@@ -264,6 +266,7 @@
         if (!inAnyTargetPage(node)) return;
         splitText(node);
         processed.add(node);
+        observeScrollFloatNode(node);
       });
     });
 
@@ -275,10 +278,32 @@
         unique.add(node);
         splitText(node);
         processed.add(node);
+        observeScrollFloatNode(node);
       });
     });
 
     scheduleScrollFloatUpdate();
+  }
+
+  function observeScrollFloatNode(node) {
+    if (!node || !window.IntersectionObserver) {
+      activeScrollFloatNodes.add(node);
+      return;
+    }
+    if (!scrollFloatVisibilityObserver) {
+      scrollFloatVisibilityObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const target = entry.target;
+          if (entry.isIntersecting) {
+            activeScrollFloatNodes.add(target);
+            updateScrollFloatNode(target);
+          } else {
+            activeScrollFloatNodes.delete(target);
+          }
+        });
+      }, { rootMargin: '280px 0px', threshold: 0 });
+    }
+    scrollFloatVisibilityObserver.observe(node);
   }
 
   function scheduleInit() {
@@ -433,6 +458,46 @@
 
   function setupMediaPerformance() {
     const root = document.getElementById('root') || document;
+    const gifVideoReplacements = [
+      'assets/brazil-case/6.gif',
+      'assets/brazil-case/7.gif',
+      'assets/brazil-case/8.gif',
+      'assets/brazil-case/10.gif',
+      'assets/brazil-case/13.gif',
+      'assets/card-case/lens-explanation.gif',
+      'assets/card-case/skin-system.gif',
+      'assets/event-case/image-01.gif',
+      'assets/home-case/event-glory-loop-new.gif',
+      'assets/home-case/fan-camp-loop.gif',
+      'assets/home-case/gift-exhibition-loop-new.gif',
+      'assets/home-case/home-display-system.gif',
+      'assets/love-case/top-effect.gif',
+      'assets/proto-home/user-folder/event-glory.gif',
+      'assets/proto-home/user-folder/gift-exhibition.gif'
+    ];
+
+    function replaceLargeGifImages() {
+      root.querySelectorAll('img').forEach((img) => {
+        const src = img.getAttribute('src') || '';
+        if (!src || img.dataset.freemGifVideoReplaced === 'true') return;
+        const normalized = src.replace(/^\.\//, '');
+        if (!gifVideoReplacements.some((item) => normalized.endsWith(item))) return;
+        const video = document.createElement('video');
+        video.dataset.freemLazySrc = `${src}.mp4`;
+        video.dataset.freemLazyPrepared = 'true';
+        video.className = `${img.className || ''} freem-gif-video`.trim();
+        video.muted = true;
+        video.loop = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.preload = 'none';
+        video.setAttribute('aria-label', img.alt || '');
+        img.dataset.freemGifVideoReplaced = 'true';
+        img.replaceWith(video);
+      });
+    }
+
+    replaceLargeGifImages();
     root.querySelectorAll('img').forEach((img) => {
       if (!img.closest('#top.hero, .hero-topbar')) {
         img.loading = 'lazy';
@@ -443,16 +508,40 @@
       img.decoding = 'async';
     });
 
+    function isHeroVideo(video) {
+      return Boolean(video.closest('#top.hero')) || video.classList.contains('hero__video');
+    }
+
+    function prepareLazyVideo(video) {
+      if (!video || isHeroVideo(video) || video.dataset.freemLazyPrepared === 'true') return;
+      const src = video.currentSrc || video.getAttribute('src');
+      if (!src) return;
+      video.dataset.freemLazyPrepared = 'true';
+      video.dataset.freemLazySrc = src;
+      video.removeAttribute('src');
+      video.preload = 'none';
+      video.load?.();
+    }
+
+    function restoreLazyVideo(video) {
+      const src = video?.dataset?.freemLazySrc;
+      if (!src || video.getAttribute('src')) return;
+      video.setAttribute('src', src);
+      video.preload = 'metadata';
+      video.load?.();
+    }
+
     const videos = Array.from(root.querySelectorAll('video'));
     videos.forEach((video) => {
-      const isHeroVideo = Boolean(video.closest('#top.hero')) || video.classList.contains('hero__video');
       video.playsInline = true;
-      if (!isHeroVideo && !video.autoplay) {
+      if (!isHeroVideo(video) && !video.autoplay) {
         video.preload = 'metadata';
       }
-      if (isHeroVideo) {
+      if (isHeroVideo(video)) {
         video.preload = 'auto';
         video.fetchPriority = 'high';
+      } else {
+        prepareLazyVideo(video);
       }
     });
 
@@ -464,6 +553,7 @@
         const video = entry.target;
         if (!(video instanceof HTMLVideoElement)) return;
         if (entry.isIntersecting) {
+          restoreLazyVideo(video);
           if (video.dataset.freemWasPlaying === 'true' || video.autoplay) {
             video.play?.().catch(() => {});
           }
@@ -480,6 +570,7 @@
 
     const observeVideos = () => {
       root.querySelectorAll('video').forEach((video) => {
+        prepareLazyVideo(video);
         if (video.dataset.freemMediaObserved === 'true') return;
         video.dataset.freemMediaObserved = 'true';
         videoObserver.observe(video);
@@ -487,7 +578,10 @@
     };
 
     observeVideos();
-    new MutationObserver(observeVideos).observe(root, { childList: true, subtree: true });
+    new MutationObserver(() => {
+      replaceLargeGifImages();
+      observeVideos();
+    }).observe(root, { childList: true, subtree: true });
   }
 
   function replaceImage(selector, src) {
