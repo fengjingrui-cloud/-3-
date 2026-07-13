@@ -447,7 +447,8 @@
     const video = document.createElement('video');
     video.src = src;
     video.controls = true;
-    video.muted = true;
+    video.muted = false;
+    video.defaultMuted = false;
     video.loop = true;
     video.playsInline = true;
     video.preload = 'metadata';
@@ -541,6 +542,11 @@
         video.preload = 'auto';
         video.fetchPriority = 'high';
       } else {
+        if (video.controls && !video.classList.contains('freem-gif-video')) {
+          video.muted = false;
+          video.defaultMuted = false;
+          video.removeAttribute('muted');
+        }
         prepareLazyVideo(video);
       }
     });
