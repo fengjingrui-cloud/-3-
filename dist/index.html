@@ -1,0 +1,60 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feng Jingrui | Virtual NFT Motion Portfolio</title>
+    <style>
+      section#top > .hero-topbar {
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+      body > .freem-home-topbar-fixed.hero-topbar--global:not(.freem-home-topbar-entered) {
+        visibility: hidden !important;
+        opacity: 0 !important;
+        transform: translate3d(-50%, -120%, 0) !important;
+      }
+    </style>
+    <script>
+      (() => {
+        document.documentElement.classList.add("motion-ready");
+        if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+        if (location.hash && location.hash !== "#top") {
+          history.replaceState(null, "", `${location.pathname}${location.search}#top`);
+        }
+        const resetToHero = () => window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+        resetToHero();
+        window.addEventListener("DOMContentLoaded", resetToHero, { once: true });
+        window.addEventListener(
+          "load",
+          () => {
+            resetToHero();
+            setTimeout(resetToHero, 80);
+            setTimeout(resetToHero, 240);
+          },
+          { once: true }
+        );
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Instrument+Serif:ital@1&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="./assets/index-BA3rzPDv.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BjV-iTvi.css">
+    <link rel="stylesheet" crossorigin href="./assets/freem-marked-overrides.css">
+    <link rel="stylesheet" crossorigin href="./assets/freem-browser-comment-overrides.css?v=20260713-topbar-no-jump">
+    <link rel="stylesheet" crossorigin href="./assets/freem-portfolio-motion.css?v=20260711-workflow-process-images-visible">
+    <script defer src="./assets/freem-marked-overrides.js?v=20260713-media-performance"></script>
+    <script defer src="./assets/freem-portfolio-motion.js?v=20260713-motion-performance"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+
+
+

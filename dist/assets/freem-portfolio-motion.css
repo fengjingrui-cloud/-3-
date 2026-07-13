@@ -1,0 +1,96 @@
+/* Motion-only layer: no layout sizing changes. */
+.motion-will-change {
+  will-change: transform, opacity, clip-path, filter;
+}
+
+.motion-reveal-clip {
+  clip-path: inset(0 0 0 0);
+}
+
+html.motion-ready main > section:not(#top):not(.overview-panel) :is(h1, h2, .split-heading, .section-heading h2, .strength-card, .featured-card, .overview-card, .project-card, .key-project-tile, .evaluation-card, article, img, video):not(.motion-revealed):not(.hero-topbar *),
+html.motion-ready .case-page > section :is(h1, h2, .split-heading, .section-heading h2, .strength-card, .featured-card, .overview-card, .project-card, .key-project-tile, .evaluation-card, article, img, video):not(.motion-revealed):not(.hero-topbar *),
+html.motion-ready .proto-page > section :is(h1, h2, .split-heading, .section-heading h2, .strength-card, .featured-card, .overview-card, .project-card, .key-project-tile, .evaluation-card, article, img, video):not(.motion-revealed):not(.hero-topbar *),
+html.motion-ready .overview-panel__inner :is(h1, h2, .split-heading, .section-heading h2, .overview-card, .project-card, article, img, video):not(.motion-revealed):not(.hero-topbar *) {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+html.motion-ready .motion-pending {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+html.motion-ready .motion-pending.motion-title {
+  clip-path: inset(0 100% 0 0) !important;
+  transform: translate3d(-34px, 150px, 0) scaleX(.52) !important;
+  filter: blur(18px) !important;
+}
+
+html.motion-ready .motion-pending.motion-card {
+  clip-path: inset(0 0 32% 0 round 22px) !important;
+  transform: translate3d(0, 148px, 0) scale(.9) !important;
+  filter: blur(16px) saturate(.72) brightness(.82) !important;
+}
+
+html.motion-ready .motion-pending.motion-media {
+  clip-path: inset(0 0 100% 0) !important;
+  transform: translate3d(0, 96px, 0) scale(1.18) !important;
+  filter: blur(14px) brightness(.62) saturate(.8) !important;
+}
+
+html.motion-ready .motion-revealed {
+  visibility: visible !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-will-change,
+  .motion-reveal-clip,
+  .motion-pending {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    clip-path: none !important;
+    filter: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* 2026-07-10: secondary pages are React state views, so keep their text visible. */
+html.motion-ready .evaluation-page :is(h1, h2, h3, h4, p, span, article, section, .evaluation-card, .freem-evaluation-main-title),
+html.motion-ready .key-projects-page :is(h1, h2, h3, h4, p, span, article, section, .key-projects-group, .key-project-tile, .freem-key-projects-main-title),
+html.motion-ready .evaluation-page .motion-pending,
+html.motion-ready .key-projects-page .motion-pending {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  filter: none !important;
+  clip-path: none !important;
+  pointer-events: auto !important;
+}
+/* 2026-07-10: higher-specificity text restore for key/evaluation secondary pages. */
+html.motion-ready body .evaluation-page .evaluation-hero h1,
+html.motion-ready body .evaluation-page .evaluation-grid .evaluation-card,
+html.motion-ready body .evaluation-page .evaluation-grid .evaluation-card h2,
+html.motion-ready body .evaluation-page .evaluation-grid .evaluation-card h3,
+html.motion-ready body .evaluation-page .evaluation-grid .evaluation-card p,
+html.motion-ready body .evaluation-page .evaluation-grid .evaluation-card span,
+html.motion-ready body .evaluation-page .evaluation-grid .evaluation-card .freem-evaluation-main-title,
+html.motion-ready body .key-projects-page .key-projects-hero h1,
+html.motion-ready body .key-projects-page .key-projects-grid .key-projects-group,
+html.motion-ready body .key-projects-page .key-projects-grid .key-projects-group h2,
+html.motion-ready body .key-projects-page .key-projects-grid .key-projects-group p,
+html.motion-ready body .key-projects-page .key-projects-grid .key-projects-group span,
+html.motion-ready body .key-projects-page .key-projects-grid .key-projects-group .key-project-tile,
+html.motion-ready body .key-projects-page .key-projects-grid .key-projects-group .key-project-tile h3,
+html.motion-ready body .key-projects-page .key-projects-grid .key-projects-group .key-project-tile h4,
+html.motion-ready body .key-projects-page .key-projects-grid .key-projects-group .key-project-tile p,
+html.motion-ready body .key-projects-page .key-projects-grid .key-projects-group .freem-key-projects-main-title {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  filter: none !important;
+  clip-path: none !important;
+  pointer-events: auto !important;
+}
